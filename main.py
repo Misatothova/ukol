@@ -4,39 +4,34 @@ projekt_1.py: první projekt do Engeto Online Python Akademie
 author: Michaela Tóthová
 email: misatothova7@seznam.cz
 """
-
 import random
+from collections import Counter
 from typing import Tuple, List
 
 
-import random
-
 def generate_secret() -> str:
-    digits = random.sample("0123456789", 4)   
-    if digits[0] == "0":                      
-        digits[0], digits[1] = digits[1], digits[0]  
-    return "".join(digits)
+    first = random.choice("123456789")
+    others = random.sample([d for d in "0123456789" if d != first], 3)
+    return first + "".join(others)
 
 
 def validate_guess(guess: str) -> Tuple[bool, List[str]]:
-   
     errors: List[str] = []
-    if len(guess) != 4:
-        errors.append("The number must have exactly 4 digits.")
     if not guess.isdigit():
         errors.append("The guess must contain only digits (0–9).")
-    else:
-        if guess[0] == "0":
-            errors.append("The number cannot start with zero.")
-        if len(set(guess)) != 4:
-            errors.append("All digits must be unique.")
+    if len(guess) != 4:
+        errors.append("The number must have exactly 4 digits.")
+    if guess and guess[0] == "0":
+        errors.append("The number cannot start with zero.")
+    if len(set(guess)) != len(guess):
+        errors.append("All digits must be unique.")
     return (len(errors) == 0, errors)
 
 
 def count_bulls_cows(secret: str, guess: str) -> Tuple[int, int]:
-    
     bulls = sum(s == g for s, g in zip(secret, guess))
-    cows = len(set(secret) & set(guess)) - bulls
+    common = sum((Counter(secret) & Counter(guess)).values())
+    cows = common - bulls
     return bulls, cows
 
 
@@ -45,7 +40,6 @@ def format_count(n: int, singular: str, plural: str) -> str:
 
 
 def get_valid_guess() -> str:
-    
     while True:
         guess = input(">>> ").strip()
         valid, errors = validate_guess(guess)
@@ -60,7 +54,6 @@ def get_valid_guess() -> str:
 
 
 def play_game(secret: str) -> None:
-   
     attempts = 0
     while True:
         guess = get_valid_guess()
@@ -81,7 +74,6 @@ def play_game(secret: str) -> None:
 
 
 def main() -> None:
-   
     print("Hi there!")
     print("-----------------------------------------------")
     print("I've generated a random 4 digit number for you.")
@@ -96,3 +88,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+
